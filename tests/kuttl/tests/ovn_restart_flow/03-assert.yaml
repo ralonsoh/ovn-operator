@@ -1,0 +1,21 @@
+#
+# Check for:
+#
+# - The current bridges flows are present in the logs; these flows writen in
+#   the logs are the ones restored from the previous "ovs-vswitchd" container
+#   execution.
+
+apiVersion: kuttl.dev/v1beta1
+kind: TestAssert
+timeout: 300
+commands:
+    - script: |
+        controller_pod=$(oc get pod -n $NAMESPACE -l service=ovn-controller-ovs -o name|head -1)
+        logs=$(oc logs -n $NAMESPACE -f $controller_pod -c ovs-vswitchd --follow=false)
+        flows=($(oc exec -n $NAMESPACE --container ovs-vswitchd $controller_pod -- bash -c 'for br in `ovs-vsctl list-br`; do ovs-ofctl dump-flows $br --no-stats; done'))
+        for flow in "${flows[@]}"; do
+            if [[ ! "$logs" =~ "$flow" ]]; then
+                exit 1;
+            fi
+        done
+        exit 0

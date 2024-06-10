@@ -1,0 +1,6 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+commands:
+  - script: |
+      controller_pod=$(oc get pod -n $NAMESPACE -l service=ovn-controller-ovs -o name|head -1)
+      oc delete -n $NAMESPACE $controller_pod 

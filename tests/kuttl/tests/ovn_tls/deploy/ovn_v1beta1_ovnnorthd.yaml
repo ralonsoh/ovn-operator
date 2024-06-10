@@ -1,0 +1,6 @@
+apiVersion: ovn.openstack.org/v1beta1
+kind: OVNNorthd
+metadata:
+  name: ovnnorthd-sample
+spec:
+  logLevel: info

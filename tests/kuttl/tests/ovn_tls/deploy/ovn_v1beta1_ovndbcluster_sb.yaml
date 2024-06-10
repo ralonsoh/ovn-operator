@@ -1,0 +1,9 @@
+apiVersion: ovn.openstack.org/v1beta1
+kind: OVNDBCluster
+metadata:
+  name: ovndbcluster-sb-sample
+spec:
+  logLevel: info
+  storageRequest: 10G
+  storageClass: local-storage
+  dbType: SB

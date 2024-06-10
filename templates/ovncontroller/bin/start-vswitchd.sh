@@ -37,6 +37,10 @@ if [ -f $FLOWS_RESTORE_SCRIPT ]; then
     # It's unsafe to leave these files in place if they fail once. Make sure we
     # remove them if the eval fails.
     trap cleanup_flows_backup EXIT
+    for bridge_flows in `find $ovs_dir -name *flows.dump`; do
+        echo Bridge to print: $bridge_flows
+        cat $bridge_flows
+    done
     eval "$(cat $FLOWS_RESTORE_SCRIPT)"
     trap - EXIT
 fi

@@ -16,6 +16,11 @@
 set -ex
 
 CTL_ARGS="--system-id=random --no-ovs-vswitchd"
+ovs_dir=/var/lib/openvswitch
+
+# Remove the is_safe_to_stop_ovsdb_server in case it exists since it is used as
+# semaphore for exiting the ovsdb-server container
+rm $ovs_dir/is_safe_to_stop_ovsdb_server || true
 
 # Initialize or upgrade database if needed
 /usr/share/openvswitch/scripts/ovs-ctl start $CTL_ARGS

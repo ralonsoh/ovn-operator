@@ -13,15 +13,18 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-ovs_dir=/var/lib/openvswitch
 
-# ovs_vswitchd container needs to terminate before ovsdb-server because it need
-# access to the db on the preStop script. This semaphore ensures it is not torn
-# down.
-while [ ! -f $ovs_dir/is_safe_to_stop_ovsdb_server ]
-do
-  sleep 0.5
+set -ex
+source $(dirname $0)/functions
+
+# The ovs_vswitchd container has to terminate before ovsdb-server because it
+# needs access to db in its preStop script. The preStop script backs up flows
+# for restoration during the next startup. This semaphore ensures the vswitchd
+# container is not torn down before flows are saved.
+while [ ! -f $SAFE_TO_STOP_OVSDB_SERVER_SEMAPHORE ]; do
+    sleep 0.5
 done
+cleanup_ovsdb_server_semaphore
 
-rm $ovs_dir/is_safe_to_stop_ovsdb_server
+# Now it's safe to stop db server. Do it.
 /usr/share/openvswitch/scripts/ovs-ctl stop --no-ovs-vswitchd
